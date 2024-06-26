@@ -40,91 +40,114 @@ const locationRadio = document.querySelectorAll("input[name='location']");
 const checkBox = document.getElementById("checkbox1");
 
 
-function verifyInput(input) {
-  if (input.value === "") {
-    throw new Error(`Le champ ${input.id} est vide`)
-  }
-
-  if (input.length < 2) {
-    throw new Error(`Le champ ${input.id} est trop court`)
-  }
+// error message function
+function setError(element, message) {
+  const formData = element.closest(".formData");
+  formData.setAttribute("data-error", message);
+  formData.setAttribute("data-error-visible", "true");
 }
 
+
+// clear error message function
+function clearError(element) {
+  const formData = element.closest(".formData");
+  formData.removeAttribute("data-error");
+  formData.removeAttribute("data-error-visible");
+}
+
+// first and last name verification
+function verifyInput(input) { 
+  clearError(input);
+  if (input.value === "") {
+    setError(input, `Le champ ${input.id} est vide.`);
+    return false;
+  }
+  if (input.value.length < 2) {
+    setError(input, `Veuillez entrer 2 caractères ou plus pour le champ ${input.id}.`);
+    return false;
+  }
+  return true;
+}
+
+
+// email verification
 function verifyEmail(email) {
+  clearError(email);
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailPattern.test(email.value)) {
-    throw new Error("L'email n'est pas valide.")
+    setError(email, "L'email n'est pas valide.");
+    return false;
   }
+  if (email.value === "") {
+    setError(email, "Veuillez saisir un email.");
+    return false;
+  }
+  return true;
 }
 
+// birth date verification
 function verifyBirthDate(birthDate) {
+  clearError(birthDate);
   if (birthDate.value === "") {
-    throw new Error("Veuillez saisir une date de naissance");
+    setError(birthDate, "Vous devez entrer votre date de naissance.");
+    return false;
   }
 }
 
+// only accepts numbers
 function verifyParticipationQuantity(participationQuantity) {
+  clearError(participationQuantity);
   const numbers = /^[0-9]+$/;
   if (!participationQuantity.value.match(numbers)) {
-    throw new Error("Veuillez saisir un nombre")
+    setError(participationQuantity, "Veuillez saisir un nombre.");
+    return false;
   }
-
   if (participationQuantity.value === "") {
-    throw Error
+    setError(participationQuantity, "Veuillez saisir un nombre.");
+    return false;
   }
-
+  return true;
 }
 
-
+// checks if a radio button is checked 
 function locationRadioValue(locationRadio) {
   let radioSelected = false;
   for (let i = 0; i < locationRadio.length; i++) {
     if (locationRadio[i].checked) {
       radioSelected = true;
-      console.log(locationRadio[i].value);
       break;
     }
-  }
-
+  };
   if (!radioSelected) {
-    throw new Error("Veuillez sélectionner une ville");
+    setError(locationRadio[0], "Vous devez choisir une option.");
+    return false;
   }
+  clearError(locationRadio[0]);
+  return true;
 }
 
 function checkBoxChecked(checkBox) {
+  clearError(checkBox);
   if (!checkBox.checked) {
-    throw new Error("Veuillez accepter les termes et conditions")
+    setError(checkBox, "Vous devez vérifier que vous acceptez les termes et conditions.");
+    return false;
   }
+  return true;
 }
 
-
-
-
-
-
 form.addEventListener("submit", (event) => {
-  try {
-    event.preventDefault()
+  event.preventDefault();
+  let formIsValid = true;
 
-    verifyInput(firstName)
+  if (!verifyInput(firstName)) formIsValid = false;
+  if (!verifyInput(lastName)) formIsValid = false;
+  if (!verifyEmail(email)) formIsValid = false;
+  if (!verifyBirthDate(birthDate)) formIsValid = false;
+  if (!verifyParticipationQuantity(participationQuantity)) formIsValid = false;
+  if (!locationRadioValue(locationRadio)) formIsValid = false;
+  if (!checkBoxChecked(checkBox)) formIsValid = false;
 
-    verifyInput(lastName)
-
-    verifyEmail(email)
-
-    verifyBirthDate(birthDate)
-
-    verifyParticipationQuantity(participationQuantity)
-
-    locationRadioValue(locationRadio)
-    
-    checkBoxChecked(checkBox)
-    
+  if (formIsValid) {
+    form.submit();
   }
-  catch (error) {
-    console.log("Une erreur est survenue : " + error.message)
-  }
-})
-
-
-
+});
