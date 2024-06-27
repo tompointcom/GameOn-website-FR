@@ -12,12 +12,15 @@ const modalbg = document.querySelector(".bground");
 const modalBtn = document.querySelectorAll(".modal-btn");
 const formData = document.querySelectorAll(".formData");
 const closeBtn = document.querySelector(".close");
-
+const modalConfirmation = document.querySelector(".modal-confirmation");
+const modalBody = document.querySelector(".modal-body");
+const btnClose = document.querySelector(".btn-close");
 // launch modal event
 modalBtn.forEach((btn) => btn.addEventListener("click", launchModal));
 
 // launch modal form
 function launchModal() {
+  resetForm();
   modalbg.style.display = "block";
 }
 
@@ -92,6 +95,7 @@ function verifyBirthDate(birthDate) {
     setError(birthDate, "Vous devez entrer votre date de naissance.");
     return false;
   }
+  return true;
 }
 
 // only accepts numbers
@@ -135,6 +139,13 @@ function checkBoxChecked(checkBox) {
   return true;
 }
 
+function showModalConfirmation () {
+  modalBody.style.display = "none";
+  modalConfirmation.style.display = "flex";
+}
+
+btnClose.addEventListener("click", closeModal);
+
 form.addEventListener("submit", (event) => {
   event.preventDefault();
   let formIsValid = true;
@@ -148,6 +159,14 @@ form.addEventListener("submit", (event) => {
   if (!checkBoxChecked(checkBox)) formIsValid = false;
 
   if (formIsValid) {
-    form.submit();
+    showModalConfirmation();
+
   }
+  
 });
+
+function resetForm() {
+  form.reset();
+  modalBody.style.display = "flex";
+  modalConfirmation.style.display = "none";
+} 
